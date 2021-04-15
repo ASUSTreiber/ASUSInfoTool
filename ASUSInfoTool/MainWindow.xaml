@@ -6,21 +6,35 @@
         xmlns:local="clr-namespace:ASUSInfoTool"
         mc:Ignorable="d"
         Title="ASUS Info Tool" Height="416" Width="400" Icon="/Asusinfo64.ico" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
-    <Grid>
-        <GroupBox  FontSize="14" Header="Geräte Info" Margin="5,0,5,260" Padding="10" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            <StackPanel VerticalAlignment="Top">
-                <TextBlock FontSize="14">Model:</TextBlock>
-                <TextBlock FontSize="14">Seriennummer:</TextBlock>
-                <TextBlock FontSize="14">Biosversion:</TextBlock>
-                <TextBlock FontSize="14">Windowsversion:</TextBlock>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox  FontSize="14" Header="Geräte Info" Padding="10" VerticalAlignment="Top" Margin="5,120,5,0">
-            <StackPanel VerticalAlignment="Top">
-                <Label Content="Label"/>
-                <Label Content="Label"/>
-                <Label Content="Label"/>
-            </StackPanel>
-        </GroupBox>
-    </Grid>
+	<Grid>
+		<GroupBox  FontSize="14" Header="Geräte Info" Margin="5,0,5,0" Padding="10" VerticalAlignment="Top">
+			<Grid RenderTransformOrigin="0.492,0.582">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="25*" />
+					<ColumnDefinition Width="2" />
+					<ColumnDefinition Width="40*" />
+				</Grid.ColumnDefinitions>
+				<StackPanel VerticalAlignment="Top">
+					<Label Content="Model"/>
+					<Label Content="Seriennummer"/>
+					<Label Content="Biosversion"/>
+					<Label Content="Windowsversion"/>
+				</StackPanel>
+				<GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
+				<StackPanel Grid.Column="2">
+					<Label Content="Model" Name="model_value"/>
+					<Label Content="Seriennummer" Name="serial_value"/>
+					<Label Content="Biosversion" Name="bios_value"/>
+					<Label Content="Windowsversion" Name="windows_value"/>
+				</StackPanel>
+			</Grid>
+		</GroupBox>
+		<GroupBox  FontSize="14" Header="Geräte Info" Padding="10" VerticalAlignment="Top" Margin="5,165,5,0">
+			<StackPanel VerticalAlignment="Top">
+				<Label Content="Label"/>
+				<Label Content="Label"/>
+				<Label Content="Label"/>
+			</StackPanel>
+		</GroupBox>
+	</Grid>
 </Window>
