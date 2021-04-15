@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASUSInfoTool"
         mc:Ignorable="d"
-        Title="ASUS Info Tool" Height="400" Width="400" Icon="/Asusinfo64.ico">
+        Title="ASUS Info Tool" Height="416" Width="400" Icon="/Asusinfo64.ico" ResizeMode="NoResize">
     <Grid>
-
+        <GroupBox Header="Geräte Info" Margin="10,10,10,254" Padding="10">
+            <StackPanel VerticalAlignment="Top">
+                <TextBlock>Model:</TextBlock>
+                <TextBlock>Seriennummer:</TextBlock>
+                <TextBlock>Biosversion:</TextBlock>
+                <TextBlock>Windowsversion:</TextBlock>
+            </StackPanel>
+        </GroupBox>
     </Grid>
 </Window>
