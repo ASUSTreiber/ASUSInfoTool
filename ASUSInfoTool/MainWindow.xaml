@@ -5,36 +5,74 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASUSInfoTool"
         mc:Ignorable="d"
-        Title="ASUS Info Tool" Height="416" Width="400" Icon="/Asusinfo64.ico" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
-	<Grid>
-		<GroupBox  FontSize="14" Header="Geräte Info" Margin="5,0,5,0" Padding="10" VerticalAlignment="Top">
-			<Grid RenderTransformOrigin="0.492,0.582">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="25*" />
-					<ColumnDefinition Width="2" />
-					<ColumnDefinition Width="40*" />
-				</Grid.ColumnDefinitions>
-				<StackPanel VerticalAlignment="Top">
-					<Label Content="Model"/>
-					<Label Content="Seriennummer"/>
-					<Label Content="Biosversion"/>
-					<Label Content="Windowsversion"/>
-				</StackPanel>
-				<GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
-				<StackPanel Grid.Column="2">
-					<Label Content="Model" Name="model_value"/>
-					<Label Content="Seriennummer" Name="serial_value"/>
-					<Label Content="Biosversion" Name="bios_value"/>
-					<Label Content="Windowsversion" Name="windows_value"/>
-				</StackPanel>
-			</Grid>
-		</GroupBox>
-		<GroupBox  FontSize="14" Header="Geräte Info" Padding="10" VerticalAlignment="Top" Margin="5,165,5,0">
-			<StackPanel VerticalAlignment="Top">
-				<Label Content="Label"/>
-				<Label Content="Label"/>
-				<Label Content="Label"/>
-			</StackPanel>
-		</GroupBox>
-	</Grid>
+        Title="ASUS Info Tool" Height="500" Width="400" Icon="/Asusinfo64.ico" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
+    <Grid Height="Auto">
+        <GroupBox  FontSize="14" Header="Geräte Info" Margin="5,0,5,0" Padding="10" VerticalAlignment="Top">
+            <Grid RenderTransformOrigin="0.492,0.582">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="40*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Top">
+                    <Label Content="Model"/>
+                    <Label Content="Seriennummer"/>
+                    <Label Content="Biosversion"/>
+                    <Label Content="Windowsversion"/>
+                </StackPanel>
+                <GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
+                <StackPanel Grid.Column="2">
+                    <Label Content="Model" Name="model_value"/>
+                    <Label Content="Seriennummer" Name="serial_value"/>
+                    <Label Content="Biosversion" Name="bios_value"/>
+                    <Label Content="Windowsversion" Name="windows_value"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <GroupBox  FontSize="14" Header="ASUS OS Info" Padding="10" VerticalAlignment="Top" Margin="5,165,5,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25*" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="40*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Top">
+                    <Label Content="AsDCDVer"/>
+                    <Label Content="AsHDIVer"/>
+                </StackPanel>
+                <GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
+                <StackPanel Grid.Column="2" >
+                    <Label Content="Not ASUS OS" Name="asdcdver_value"/>
+                    <Label Content="Not ASUS OS" Name="ashdiver_value"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <GroupBox  FontSize="14" Header="ASUS APP Info" Padding="10" VerticalAlignment="Top" Margin="5,273,5,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="35*" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="40*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Top">
+                    <Label Content="MyASUS"/>
+                    <Label Content="ROG Armoury"/>
+                    <Label Content="Armoury Crate Service"/>
+                    <Label Content="ROG Live Service"/>
+                </StackPanel>
+                <GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
+                <StackPanel Grid.Column="2" >
+                    <Label Content="Not ASUS OS" Name="myasus_value"/>
+                    <Label Content="Not ASUS OS" Name="armoury_value"/>
+                    <Label Content="Not ASUS OS" Name="armouryservice_value"/>
+                    <Label Content="Not ASUS OS" Name="rogliveservice_value"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <Grid>
+            <StackPanel VerticalAlignment="Stretch">
+                <Button Content="LOG Datei erstellen" Name="createlog_button" HorizontalAlignment="Center" Margin="0,438,0,0" VerticalAlignment="Top" Width="150"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>
