@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ASUSInfoTool"
         mc:Ignorable="d"
-        Title="ASUS Info Tool" Height="500" Width="400" Icon="/Asusinfo64.ico" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
+        Title="ASUS Info Tool" Height="500" Width="400" Icon="Asusinfo64.ico" ResizeMode="NoResize" WindowStyle="SingleBorderWindow">
     <Grid Height="Auto">
         <GroupBox  FontSize="14" Header="Geräte Info" Margin="5,0,5,0" Padding="10" VerticalAlignment="Top">
             <Grid RenderTransformOrigin="0.492,0.582">
@@ -22,7 +22,7 @@
                 </StackPanel>
                 <GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
                 <StackPanel Grid.Column="2">
-                    <Label Content="Model" Name="model_value"/>
+                    <Label Content="Model" x:Name="model_value"/>
                     <Label Content="Seriennummer" Name="serial_value"/>
                     <Label Content="Biosversion" Name="bios_value"/>
                     <Label Content="Windowsversion" Name="windows_value"/>
