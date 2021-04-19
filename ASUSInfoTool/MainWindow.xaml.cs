@@ -24,6 +24,8 @@ namespace ASUSInfoTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const string localMachine = "HKEY_LOCAL_MACHINE";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,6 +35,7 @@ namespace ASUSInfoTool
             GetOSVersion();
             //GetVGACard();
             CheckOS();
+            CheckApps();
         }
         /// <summary>
         /// Get Model and Serialnumber of System
@@ -45,7 +48,7 @@ namespace ASUSInfoTool
             foreach (var provider in providers)
             {
                 model_value.Content = provider["Product"];
-               
+
             }
         }
 
@@ -61,6 +64,7 @@ namespace ASUSInfoTool
             {
                 serial_value.Content = provider["SerialNumber"];
                 bios_value.Content = provider["SMBIOSBIOSVersion"];
+                Console.WriteLine(serialnumber);
             }
         }
 
@@ -69,9 +73,8 @@ namespace ASUSInfoTool
         /// </summary>
         private void GetOSVersion()
         {
-            const string localMachine = "HKEY_LOCAL_MACHINE";
             const string subkey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-            const string keyName = localMachine + "\\" + subkey;
+            const string keyName = MainWindow.localMachine + "\\" + subkey;
 
             var OSVersion = Registry.GetValue(keyName, "DisplayVersion", Registry.GetValue(keyName, "ReleaseID", null));
             var CurrentBuild = Registry.GetValue(keyName, "CurrentBuild", null);
@@ -110,27 +113,44 @@ namespace ASUSInfoTool
             string windir = Environment.GetEnvironmentVariable("windir");
             string AsDCDVer = windir + "\\AsDCDVer.txt";
             string AsHDIVer = windir + "\\AsHDIVer.txt";
-            var asdcd = (File.Exists(AsDCDVer) ? File.ReadLines(AsDCDVer).First() : "Not ASUS OS");
-            var ashdi = (File.Exists(AsHDIVer) ? File.ReadLines(AsHDIVer).First() : "Not ASUS OS");
-            asdcdver_value.Content = asdcd;
-            ashdiver_value.Content = ashdi;
+            string asdcd = File.Exists(AsDCDVer) ? File.ReadLines(@AsDCDVer).First() : "Not ASUS OS";
+            string ashdi = File.Exists(AsHDIVer) ? File.ReadLines(@AsHDIVer).First() : "Not ASUS OS";
+            asdcdver_value.Text = asdcd;
+            ashdiver_value.Text = ashdi;
         }
 
         /// <summary>
         /// Check Desktop Apps
         /// </summary>
-        private voide CheckApp()
-        {
-
+        /// 
+        private void CheckApps()
+        { 
+            armouryservice_value.Content = Checkapp("ARMOURY CRATE Service");
+            rogliveservice_value.Content = Checkapp("ROGLiveServicePackage");
         }
 
+        public static string Checkapp(string app)
+        {
+            string subkey = "SOFTWARE\\ASUS\\";
+            string keyName = localMachine + "\\" + subkey + app;
+
+            var DisplayVersion = Registry.GetValue(keyName, "DisplayVersion", null);
+            if (DisplayVersion != null)
+            {
+                return (string)DisplayVersion;
+            }
+            else
+            {
+                return "Not installed";
+            }
+        }
         /// <summary>
         /// Check UWP Apps
         /// </summary>
-        private voide CheckUWPApp()
-        {
+        ///private voide CheckUWPApp()
+        ///{
+        ///
+        ///}
 
-        }
-
-}
+    }
 }

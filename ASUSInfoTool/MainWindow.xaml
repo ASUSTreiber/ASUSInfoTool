@@ -41,9 +41,13 @@
                     <Label Content="AsHDIVer"/>
                 </StackPanel>
                 <GridSplitter Width="2" HorizontalAlignment="Center" Grid.Column="1" IsEnabled="False" Visibility="Hidden" />
-                <StackPanel Grid.Column="2" >
-                    <Label Content="Not ASUS OS" Name="asdcdver_value"/>
-                    <Label Content="Not ASUS OS" Name="ashdiver_value"/>
+                <StackPanel Grid.Column="2">
+                    <StackPanel Orientation="Horizontal" MinHeight="29">
+                        <TextBlock x:Name="asdcdver_value" TextWrapping="Wrap" Text="Not ASUS OS" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" MinHeight="29">
+                        <TextBlock x:Name="ashdiver_value" TextWrapping="Wrap" Text="Not ASUS OS" VerticalAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </GroupBox>
