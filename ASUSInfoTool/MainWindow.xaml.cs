@@ -17,6 +17,8 @@ using System.Runtime;
 using System.IO;
 using System.Collections;
 using Microsoft.Win32;
+using Windows.Management.Deployment;
+using System.Threading;
 
 namespace ASUSInfoTool
 {
@@ -26,45 +28,81 @@ namespace ASUSInfoTool
     public partial class MainWindow : Window
     {
         private const string localMachine = "HKEY_LOCAL_MACHINE";
+        //private const string[] AppSearch = new string[]("ASUSPCAssistant", "ScreenPadMaster", "Armoury", "ASUSKeyboardHotkeys", "ASUSBatteryHealthCharging");
 
         public MainWindow()
         {
             InitializeComponent();
-
-            GetBios();
-            GetBaseboard();
+            FillData();
             GetOSVersion();
             CheckOS();
             CheckApps();
+         }
+
+        public static async Task GetList()
+        {
+            var pm = new PackageManager();
+            var packages = pm.FindPackagesForUser("");
+            foreach (var package in packages)
+            {
+                var asyncResult = package.GetAppListEntriesAsync();
+                while (asyncResult.Status != Windows.Foundation.AsyncStatus.Completed)
+                {
+                    Thread.Sleep(5);
+                }
+                foreach (var app in asyncResult.GetResults())
+                {
+                    string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
+                    using StreamWriter file = new(desktop + "\\LOG-SN.txt", append: true);
+                    await file.WriteLineAsync(app.DisplayInfo.DisplayName);
+                }
+            }
         }
+
+       private void FillData()
+       {
+            model_value.Content = GetBaseboard()[0];
+            if (GetBios()[0] != "System Serial Number")
+            {
+                serial_value.Content = GetBaseboard()[1];
+            }
+            else
+            { 
+                serial_value.Content = GetBios()[0];
+            }
+            bios_value.Content = GetBios()[1];
+       }
+
         /// <summary>
         /// Get Model and Serialnumber of System
         /// </summary>
-        private void GetBaseboard()
+        private ArrayList GetBaseboard()
         {
             System.Management.ManagementClass wmi = new("win32_baseboard");
             var providers = wmi.GetInstances();
-
+            var product = new ArrayList();
             foreach (var provider in providers)
             {
-                model_value.Content = provider["Product"];
-
+                product.Add(provider["Product"].ToString());
+                product.Add(provider["SerialNumber"].ToString());
             }
+            return product;
         }
 
         /// <summary>
         /// Get Bios Version
         /// </summary>
-        private void GetBios()
+        private ArrayList GetBios()
         {
             System.Management.ManagementClass wmi = new("win32_bios");
             var providers = wmi.GetInstances();
-
+            var bios = new ArrayList();
             foreach (var provider in providers)
             {
-                serial_value.Content = provider["SerialNumber"];
-                bios_value.Content = provider["SMBIOSBIOSVersion"];
+                bios.Add(provider["SerialNumber"].ToString());
+                bios.Add(provider["SMBIOSBIOSVersion"].ToString());
             }
+            return bios;
         }
 
         /// <summary>
