@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Management;
 using System.Runtime;
 using System.IO;
+using System.Collections;
 using Microsoft.Win32;
 
 namespace ASUSInfoTool
@@ -33,7 +34,6 @@ namespace ASUSInfoTool
             GetBios();
             GetBaseboard();
             GetOSVersion();
-            //GetVGACard();
             CheckOS();
             CheckApps();
         }
@@ -64,7 +64,6 @@ namespace ASUSInfoTool
             {
                 serial_value.Content = provider["SerialNumber"];
                 bios_value.Content = provider["SMBIOSBIOSVersion"];
-                Console.WriteLine(serialnumber);
             }
         }
 
@@ -92,18 +91,18 @@ namespace ASUSInfoTool
         /// <summary>
         /// Get VGA Card Name and DriverVersion
         /// </summary>
-        //private void GetVGACard()
-        //{
-        //    System.Management.ManagementClass wmi = new("win32_videocontroller");
-        //    var providers = wmi.GetInstances();
-        //
-        //    foreach (var provider in providers)
-        //    {
-        //        myasus_value.Content = provider["Name"];
-        //        armoury_value.Content = provider["DriverVersion"];
-        //    }
-        //
-        //}
+        public static void GetVGACard()
+        {
+            System.Management.ManagementClass wmi = new("win32_videocontroller");
+            var providers = wmi.GetInstances();
+
+            var myAL = new ArrayList();
+            foreach (var provider in providers)
+            {
+                myAL.Add(provider["Name"]);
+                myAL.Add(provider["DriverVersion"]);
+            }
+        }
 
         /// <summary>
         /// Check if ASUS OS
@@ -152,5 +151,18 @@ namespace ASUSInfoTool
         ///
         ///}
 
-    }
+        /// <summary>
+        /// Submit to create logfile
+        /// </summary>
+
+        /// <summary>
+        /// Write to file
+        /// </summary>
+        public static async Task ExampleAsync()
+        {
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
+            using StreamWriter file = new(desktop + "\\LOG-SN.txt", append: true);
+            await file.WriteLineAsync("Fourth line");
+        }
+}
 }
