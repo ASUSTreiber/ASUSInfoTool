@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,8 +19,8 @@ using System.Runtime;
 using System.IO;
 using System.Collections;
 using Microsoft.Win32;
-using Windows.Management.Deployment;
 using System.Threading;
+using System.Management.Automation;
 
 namespace ASUSInfoTool
 {
@@ -39,30 +41,39 @@ namespace ASUSInfoTool
             CheckApps();
          }
 
-        public static async Task GetList()
+        private ArrayList AppX(string args)
         {
-            var pm = new PackageManager();
-            var packages = pm.FindPackagesForUser("");
-            foreach (var package in packages)
+            using (PowerShell PowerShellInst = PowerShell.Create())
             {
-                var asyncResult = package.GetAppListEntriesAsync();
-                while (asyncResult.Status != Windows.Foundation.AsyncStatus.Completed)
+                string criteria = args;
+                var appx = new ArrayList();
+                PowerShellInst.AddScript("Get-AppxPackage " + criteria);
+                Collection<PSObject> PSOutput = PowerShellInst.Invoke();
+                foreach (PSObject obj in PSOutput)
                 {
-                    Thread.Sleep(5);
+                    if (obj != null)
+                    {
+                        //appx.Add(obj.Properties["Name"].Value.ToString() + " - "));
+                        appx.Add(obj.Properties["Version"].Value.ToString());
+                    }
                 }
-                foreach (var app in asyncResult.GetResults())
+                if(appx.Count > 0)
                 {
-                    string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
-                    using StreamWriter file = new(desktop + "\\LOG-SN.txt", append: true);
-                    await file.WriteLineAsync(app.DisplayInfo.DisplayName);
+                    return appx;
                 }
+                else
+                {
+                    appx.Add("Not Installed");
+                    return appx;
+                }
+                
             }
         }
 
-       private void FillData()
-       {
+        private void FillData()
+        {
             model_value.Content = GetBaseboard()[0];
-            if (GetBios()[0] != "System Serial Number")
+            if (GetBios()[0].ToString() == "System Serial Number")
             {
                 serial_value.Content = GetBaseboard()[1];
             }
@@ -71,7 +82,9 @@ namespace ASUSInfoTool
                 serial_value.Content = GetBios()[0];
             }
             bios_value.Content = GetBios()[1];
-       }
+            myasus_value.Content = AppX("*ASUSPCAssistant*")[0];
+            armoury_value.Content = AppX("*armoury*")[0];
+        }
 
         /// <summary>
         /// Get Model and Serialnumber of System
