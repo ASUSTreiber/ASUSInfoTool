@@ -75,7 +75,7 @@
         </GroupBox>
         <Grid>
             <StackPanel VerticalAlignment="Stretch">
-                <Button Content="LOG Datei erstellen" Name="createlog_button" HorizontalAlignment="Center" Margin="0,438,0,0" VerticalAlignment="Top" Width="150"/>
+                <Button Content="LOG Datei erstellen" Name="Createlog_Button" Click="Createlog_Button_Click" HorizontalAlignment="Center" Margin="0,438,0,0" VerticalAlignment="Top" Width="150"/>
             </StackPanel>
         </Grid>
     </Grid>

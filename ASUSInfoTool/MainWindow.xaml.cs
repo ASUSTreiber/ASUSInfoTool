@@ -39,7 +39,15 @@ namespace ASUSInfoTool
             GetOSVersion();
             CheckOS();
             CheckApps();
-         }
+        }
+
+        private async void Createlog_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Createlog_Button.IsEnabled = false;
+            await WriteLog();
+            MessageBox.Show("Log wurde geschrieben und auf dem Desktop gespeichert.\nBitte senden Sie die Datei an den Support.");
+            Createlog_Button.IsEnabled = true;
+        }
 
         private ArrayList AppX(string args)
         {
@@ -209,11 +217,24 @@ namespace ASUSInfoTool
         /// <summary>
         /// Write to file
         /// </summary>
-        public static async Task ExampleAsync()
+        public async Task WriteLog()
         {
+            string serial;
+            if (GetBios()[0].ToString() == "System Serial Number")
+            {
+                serial = GetBaseboard()[1].ToString();
+            }
+            else
+            {
+                serial = GetBios()[0].ToString();
+            }
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
-            using StreamWriter file = new(desktop + "\\LOG-SN.txt", append: true);
-            await file.WriteLineAsync("Fourth line");
+            using StreamWriter file = new(desktop + "\\LOG-" + serial + ".txt", append: true);
+            await file.WriteLineAsync("====================================================");
+            await file.WriteLineAsync("Model: " + GetBaseboard()[0].ToString());
+            await file.WriteLineAsync("Serial: " + serial);
+            await file.WriteLineAsync("Biosversion: " + GetBios()[1].ToString());
+            await file.WriteLineAsync("====================================================");
         }
 }
 }
