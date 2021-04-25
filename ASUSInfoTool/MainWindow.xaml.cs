@@ -29,16 +29,13 @@ namespace ASUSInfoTool
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string localMachine = "HKEY_LOCAL_MACHINE";
-        //private const string[] AppSearch = new string[]("ASUSPCAssistant", "ScreenPadMaster", "Armoury", "ASUSKeyboardHotkeys", "ASUSBatteryHealthCharging");
+        private const string acs = "ARMOURY CRATE Service";
+        private const string rog = "ROGLiveServicePackage";
 
         public MainWindow()
         {
             InitializeComponent();
             FillData();
-            GetOSVersion();
-            CheckOS();
-            CheckApps();
         }
 
         private async void Createlog_Button_Click(object sender, RoutedEventArgs e)
@@ -49,37 +46,9 @@ namespace ASUSInfoTool
             Createlog_Button.IsEnabled = true;
         }
 
-        private ArrayList AppX(string args)
-        {
-            using (PowerShell PowerShellInst = PowerShell.Create())
-            {
-                string criteria = args;
-                var appx = new ArrayList();
-                PowerShellInst.AddScript("Get-AppxPackage " + criteria);
-                Collection<PSObject> PSOutput = PowerShellInst.Invoke();
-                foreach (PSObject obj in PSOutput)
-                {
-                    if (obj != null)
-                    {
-                        //appx.Add(obj.Properties["Name"].Value.ToString() + " - "));
-                        appx.Add(obj.Properties["Version"].Value.ToString());
-                    }
-                }
-                if(appx.Count > 0)
-                {
-                    return appx;
-                }
-                else
-                {
-                    appx.Add("Not Installed");
-                    return appx;
-                }
-                
-            }
-        }
-
         private void FillData()
         {
+            var data = new GetData();
             model_value.Content = GetBaseboard()[0];
             if (GetBios()[0].ToString() == "System Serial Number")
             {
@@ -90,8 +59,13 @@ namespace ASUSInfoTool
                 serial_value.Content = GetBios()[0];
             }
             bios_value.Content = GetBios()[1];
-            myasus_value.Content = AppX("*ASUSPCAssistant*")[0];
-            armoury_value.Content = AppX("*armoury*")[0];
+            myasus_value.Content = data.AppX("*ASUSPCAssistant*")[0];
+            armoury_value.Content = data.AppX("*armoury*")[0];
+            windows_value.Content = data.GetOSVersion();
+            armouryservice_value.Content = data.Checkapp(acs);
+            rogliveservice_value.Content = data.Checkapp(rog);
+            asdcdver_value.Text = data.CheckASDC();
+            ashdiver_value.Text = data.CheckASHDI();
         }
 
         /// <summary>
@@ -126,26 +100,7 @@ namespace ASUSInfoTool
             return bios;
         }
 
-        /// <summary>
-        /// Get OS Buildname like 20h2 and get Buildnumber and PatchLevel from Registry
-        /// </summary>
-        private void GetOSVersion()
-        {
-            const string subkey = "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion";
-            const string keyName = MainWindow.localMachine + "\\" + subkey;
-
-            var OSVersion = Registry.GetValue(keyName, "DisplayVersion", Registry.GetValue(keyName, "ReleaseID", null));
-            var CurrentBuild = Registry.GetValue(keyName, "CurrentBuild", null);
-            var PatchLevel = Registry.GetValue(keyName, "UBR", null);
-            if (OSVersion != null)
-            {
-                windows_value.Content = OSVersion + " - " + CurrentBuild + "." + PatchLevel;
-            }
-            else
-            {
-                windows_value.Content = "error";
-            }
-        }
+       
 
         /// <summary>
         /// Get VGA Card Name and DriverVersion
@@ -164,58 +119,7 @@ namespace ASUSInfoTool
         }
 
         /// <summary>
-        /// Check if ASUS OS
-        /// </summary>
-        private void CheckOS()
-        {
-            string windir = Environment.GetEnvironmentVariable("windir");
-            string AsDCDVer = windir + "\\AsDCDVer.txt";
-            string AsHDIVer = windir + "\\AsHDIVer.txt";
-            string asdcd = File.Exists(AsDCDVer) ? File.ReadLines(@AsDCDVer).First() : "Not ASUS OS";
-            string ashdi = File.Exists(AsHDIVer) ? File.ReadLines(@AsHDIVer).First() : "Not ASUS OS";
-            asdcdver_value.Text = asdcd;
-            ashdiver_value.Text = ashdi;
-        }
-
-        /// <summary>
-        /// Check Desktop Apps
-        /// </summary>
-        /// 
-        private void CheckApps()
-        { 
-            armouryservice_value.Content = Checkapp("ARMOURY CRATE Service");
-            rogliveservice_value.Content = Checkapp("ROGLiveServicePackage");
-        }
-
-        public static string Checkapp(string app)
-        {
-            string subkey = "SOFTWARE\\ASUS\\";
-            string keyName = localMachine + "\\" + subkey + app;
-
-            var DisplayVersion = Registry.GetValue(keyName, "DisplayVersion", null);
-            if (DisplayVersion != null)
-            {
-                return (string)DisplayVersion;
-            }
-            else
-            {
-                return "Not installed";
-            }
-        }
-        /// <summary>
-        /// Check UWP Apps
-        /// </summary>
-        ///private voide CheckUWPApp()
-        ///{
-        ///
-        ///}
-
-        /// <summary>
         /// Submit to create logfile
-        /// </summary>
-
-        /// <summary>
-        /// Write to file
         /// </summary>
         public async Task WriteLog()
         {
