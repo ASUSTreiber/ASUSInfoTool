@@ -14,7 +14,6 @@ namespace ASUSInfoTool
         private const string acs = "ARMOURY CRATE Service";
         private const string rog = "ROGLiveServicePackage";
         private const string atk = "ATK Package";
-        private string tempfile = System.IO.Path.GetTempPath() + "\\Temp.txt";
 
         public MainWindow()
         {
