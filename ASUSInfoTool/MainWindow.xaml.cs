@@ -80,23 +80,23 @@ namespace ASUSInfoTool
                 {
                     string[] gpudata = gpu.ToString().Split(',');
                     file.WriteLineAsync("GPU    : " + gpudata[0]);
-                    file.WriteLineAsync("Driver : " + gpudata[1]);
+                    file.WriteLineAsync("Driver : " + gpudata[1] + "\n");
                 }
-                file.WriteLineAsync("ASUS LOG═══════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ASUS LOG ══════════════════════════════════════════════════════════════");
                 file.WriteLineAsync("ASDCD : " + data.CheckASDC());
-                file.WriteLineAsync("ASHDI : " + data.CheckASHDI());
-                file.WriteLineAsync("ASUS APPs══════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ASHDI : " + data.CheckASHDI() + "\n");
+                file.WriteLineAsync("ASUS APPs ═════════════════════════════════════════════════════════════");
                 file.WriteLineAsync("MyASUS : " + data.AppX("*ASUSPCAssistant*")[0]);
                 file.WriteLineAsync("ScreenXpert  : " + data.AppX("*ScreenPadMaster*")[0]);
                 file.WriteLineAsync("ArmouryCrate : " + data.AppX("*armoury*")[0]);
                 file.WriteLineAsync("AURA Creator : " + data.AppX("*AURACreator*")[0]);
                 file.WriteLineAsync("KeyboardHotkeys : " + data.AppX("*ASUSKeyboardHotkeys*")[0]);
-                file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0]);
-                file.WriteLineAsync("ASUS Services══════════════════════════════════════════════════════════");
+                file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0] + "\n");
+                file.WriteLineAsync("ASUS Services ═════════════════════════════════════════════════════════");
                 file.WriteLineAsync("ArmouryCrate Service : " + data.Checkapp(acs));
                 file.WriteLineAsync("ROG Live Service : " + data.Checkapp(rog));
-                file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk));
-                file.WriteLineAsync("ASUS Drivers═══════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk) + "\n");
+                file.WriteLineAsync("ASUS Drivers ══════════════════════════════════════════════════════════");
                 file.WriteLineAsync("Keyboard Hotkeys (ATK) : " + data.GetDriver("ATK Package")[0].ToString());
                 file.WriteLineAsync("System Control Interface : " + data.GetDriver("ASUS System Control Interface")[0].ToString());
                 file.WriteLineAsync("Precision Touchpad : " + data.GetDriver("ASUS Precision Touchpad")[0].ToString());
