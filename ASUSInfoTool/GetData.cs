@@ -1,25 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Management;
-using System.Runtime;
-using System.IO;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections;
-using Microsoft.Win32;
-using System.Threading;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Management.Automation;
 
 namespace ASUSInfoTool
@@ -40,7 +24,6 @@ namespace ASUSInfoTool
                 {
                     if (obj != null)
                     {
-                        //appx.Add(obj.Properties["Name"].Value.ToString() + " - "));
                         appx.Add(obj.Properties["Version"].Value.ToString());
                     }
                 }
@@ -110,6 +93,81 @@ namespace ASUSInfoTool
             string AsHDIVer = windir + "\\AsHDIVer.txt";
             string ashdi = File.Exists(AsHDIVer) ? File.ReadLines(@AsHDIVer).First() : "Not ASUS OS";
             return ashdi;
+        }
+
+        /// <summary>
+        /// Get Model and Serialnumber of System
+        /// </summary>
+        public ArrayList GetBaseboard()
+        {
+            System.Management.ManagementClass wmi = new("win32_baseboard");
+            var providers = wmi.GetInstances();
+            var product = new ArrayList();
+            foreach (var provider in providers)
+            {
+                product.Add(provider["Product"].ToString());
+                product.Add(provider["SerialNumber"].ToString());
+            }
+            return product;
+        }
+
+        /// <summary>
+        /// Get Bios Version
+        /// </summary>
+        public ArrayList GetBios()
+        {
+            System.Management.ManagementClass wmi = new("win32_bios");
+            var providers = wmi.GetInstances();
+            var bios = new ArrayList();
+            foreach (var provider in providers)
+            {
+                bios.Add(provider["SerialNumber"].ToString());
+                bios.Add(provider["SMBIOSBIOSVersion"].ToString());
+            }
+            return bios;
+        }
+
+        /// <summary>
+        /// Get VGA Card Name and DriverVersion
+        /// </summary>
+        public ArrayList GetVGACard()
+        {
+            System.Management.ManagementClass wmi = new("win32_videocontroller");
+            var providers = wmi.GetInstances();
+
+            var myAL = new ArrayList();
+            foreach (var provider in providers)
+            {
+                myAL.Add(provider["Name"] + "," + provider["DriverVersion"]);
+            }
+            return myAL;
+        }
+
+        /// <summary>
+        /// Get Driver Data
+        /// </summary>
+        public ArrayList GetDriver(string args)
+        {
+            string driver = args;
+            var device = new ArrayList();
+            using PowerShell PowerShellInst = PowerShell.Create();
+            PowerShellInst.AddScript("Get-WmiObject Win32_PnPSignedDriver | where {$_.DeviceName -like \"*" + driver + "*\"}");
+            Collection<PSObject> PSOutput = PowerShellInst.Invoke();
+            foreach (PSObject obj in PSOutput)
+            {
+                device.Add(obj.Properties["DriverVersion"].Value.ToString()
+                           + " - "
+                           + obj.Properties["DeviceID"].Value.ToString());
+            }
+            if (device.Count > 0)
+            {
+                return device;
+            }
+            else
+            {
+                device.Add("Not Installed");
+                return device;
+            }
         }
     }
 }

@@ -1,26 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Management;
-using System.Runtime;
-using System.IO;
-using System.Collections;
-using Microsoft.Win32;
-using System.Threading;
-using System.Management.Automation;
 
 namespace ASUSInfoTool
 {
@@ -31,6 +13,8 @@ namespace ASUSInfoTool
     {
         private const string acs = "ARMOURY CRATE Service";
         private const string rog = "ROGLiveServicePackage";
+        private const string atk = "ATK Package";
+        private string tempfile = System.IO.Path.GetTempPath() + "\\Temp.txt";
 
         public MainWindow()
         {
@@ -40,25 +24,22 @@ namespace ASUSInfoTool
 
         private async void Createlog_Button_Click(object sender, RoutedEventArgs e)
         {
-            Createlog_Button.IsEnabled = false;
             await WriteLog();
-            MessageBox.Show("Log wurde geschrieben und auf dem Desktop gespeichert.\nBitte senden Sie die Datei an den Support.");
-            Createlog_Button.IsEnabled = true;
         }
 
         private void FillData()
         {
             var data = new GetData();
-            model_value.Content = GetBaseboard()[0];
-            if (GetBios()[0].ToString() == "System Serial Number")
+            model_value.Content = data.GetBaseboard()[0];
+            if (data.GetBios()[0].ToString() == "System Serial Number")
             {
-                serial_value.Content = GetBaseboard()[1];
+                serial_value.Content = data.GetBaseboard()[1];
             }
             else
             { 
-                serial_value.Content = GetBios()[0];
+                serial_value.Content = data.GetBios()[0];
             }
-            bios_value.Content = GetBios()[1];
+            bios_value.Content = data.GetBios()[1];
             myasus_value.Content = data.AppX("*ASUSPCAssistant*")[0];
             armoury_value.Content = data.AppX("*armoury*")[0];
             windows_value.Content = data.GetOSVersion();
@@ -69,76 +50,64 @@ namespace ASUSInfoTool
         }
 
         /// <summary>
-        /// Get Model and Serialnumber of System
-        /// </summary>
-        private ArrayList GetBaseboard()
-        {
-            System.Management.ManagementClass wmi = new("win32_baseboard");
-            var providers = wmi.GetInstances();
-            var product = new ArrayList();
-            foreach (var provider in providers)
-            {
-                product.Add(provider["Product"].ToString());
-                product.Add(provider["SerialNumber"].ToString());
-            }
-            return product;
-        }
-
-        /// <summary>
-        /// Get Bios Version
-        /// </summary>
-        private ArrayList GetBios()
-        {
-            System.Management.ManagementClass wmi = new("win32_bios");
-            var providers = wmi.GetInstances();
-            var bios = new ArrayList();
-            foreach (var provider in providers)
-            {
-                bios.Add(provider["SerialNumber"].ToString());
-                bios.Add(provider["SMBIOSBIOSVersion"].ToString());
-            }
-            return bios;
-        }
-
-       
-
-        /// <summary>
-        /// Get VGA Card Name and DriverVersion
-        /// </summary>
-        public static void GetVGACard()
-        {
-            System.Management.ManagementClass wmi = new("win32_videocontroller");
-            var providers = wmi.GetInstances();
-
-            var myAL = new ArrayList();
-            foreach (var provider in providers)
-            {
-                myAL.Add(provider["Name"]);
-                myAL.Add(provider["DriverVersion"]);
-            }
-        }
-
-        /// <summary>
         /// Submit to create logfile
         /// </summary>
         public async Task WriteLog()
         {
-            string serial;
-            if (GetBios()[0].ToString() == "System Serial Number")
+
+            Createlog_Button.Content = "Bitte Warten...";
+            Createlog_Button.IsEnabled = false;
+            await Task.Run(() =>
             {
-                serial = GetBaseboard()[1].ToString();
-            }
-            else
-            {
-                serial = GetBios()[0].ToString();
-            }
-            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
-            using StreamWriter file = new(desktop + "\\LOG-" + serial + ".txt", append: true);
-            await file.WriteLineAsync("====================================================");
-            await file.WriteLineAsync("Model: " + GetBaseboard()[0].ToString());
-            await file.WriteLineAsync("Serial: " + serial);
-            await file.WriteLineAsync("Biosversion: " + GetBios()[1].ToString());
-            await file.WriteLineAsync("====================================================");
+                var data = new GetData();
+                string serial;
+                if (data.GetBios()[0].ToString() == "System Serial Number")
+                {
+                    serial = data.GetBaseboard()[1].ToString();
+                }
+                else
+                {
+                    serial = data.GetBios()[0].ToString();
+                }
+                serial = Regex.Replace(serial, @"\s", "");
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
+                using StreamWriter file = new(desktop + "\\ASUS-LOG-" + serial + ".txt", append: false);
+                file.WriteLineAsync("═══════════════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("Model  : " + data.GetBaseboard()[0].ToString());
+                file.WriteLineAsync("Serial : " + serial);
+                file.WriteLineAsync("Bios   : " + data.GetBios()[1].ToString());
+                file.WriteLineAsync("OSVer  : " + data.GetOSVersion());
+                foreach (var gpu in data.GetVGACard())
+                {
+                    string[] gpudata = gpu.ToString().Split(',');
+                    file.WriteLineAsync("GPU    : " + gpudata[0]);
+                    file.WriteLineAsync("Driver : " + gpudata[1]);
+                }
+                file.WriteLineAsync("ASUS LOG═══════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ASDCD : " + data.CheckASDC());
+                file.WriteLineAsync("ASHDI : " + data.CheckASHDI());
+                file.WriteLineAsync("ASUS APPs══════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("MyASUS : " + data.AppX("*ASUSPCAssistant*")[0]);
+                file.WriteLineAsync("ScreenXpert  : " + data.AppX("*ScreenPadMaster*")[0]);
+                file.WriteLineAsync("ArmouryCrate : " + data.AppX("*armoury*")[0]);
+                file.WriteLineAsync("AURA Creator : " + data.AppX("*AURACreator*")[0]);
+                file.WriteLineAsync("KeyboardHotkeys : " + data.AppX("*ASUSKeyboardHotkeys*")[0]);
+                file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0]);
+                file.WriteLineAsync("ASUS Services══════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ArmouryCrate Service : " + data.Checkapp(acs));
+                file.WriteLineAsync("ROG Live Service : " + data.Checkapp(rog));
+                file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk));
+                file.WriteLineAsync("ASUS Drivers═══════════════════════════════════════════════════════════");
+                file.WriteLineAsync("Keyboard Hotkeys (ATK) : " + data.GetDriver("ATK Package")[0].ToString());
+                file.WriteLineAsync("System Control Interface : " + data.GetDriver("ASUS System Control Interface")[0].ToString());
+                file.WriteLineAsync("Precision Touchpad : " + data.GetDriver("ASUS Precision Touchpad")[0].ToString());
+                file.WriteLineAsync("Number Pad : " + data.GetDriver("ASUS Number Pad")[0].ToString());
+                file.WriteLineAsync("ScreenXpert Interface  : " + data.GetDriver("ASUS ScreenXpert Interface")[0].ToString());
+                file.WriteLineAsync("Wireless Radio Control : " + data.GetDriver("ASUS Wireless Radio Control")[0].ToString());
+            });
+            MessageBox.Show("Log wurde geschrieben und auf dem Desktop gespeichert.\nBitte senden Sie die Datei an den Support.");
+            Createlog_Button.Content = "LOG Datei erstellen";
+            Createlog_Button.IsEnabled = true;
         }
 }
 }
