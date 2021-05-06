@@ -13,6 +13,7 @@ namespace ASUSInfoTool
     {
         private const string acs = "ARMOURY CRATE Service";
         private const string rog = "ROGLiveServicePackage";
+        private const string rogwow64 = "ROG Live Service";
         private const string atk = "ATK Package";
 
         public MainWindow()
@@ -43,7 +44,7 @@ namespace ASUSInfoTool
             armoury_value.Content = data.AppX("*armoury*")[0];
             windows_value.Content = data.GetOSVersion();
             armouryservice_value.Content = data.Checkapp(acs);
-            rogliveservice_value.Content = data.Checkapp(rog);
+            rogliveservice_value.Content = data.Checkapp(rog) is "Not installed" or "0" ? data.CheckappWow(rogwow64) : data.Checkapp(rog);
             asdcdver_value.Text = data.CheckASDC();
             ashdiver_value.Text = data.CheckASHDI();
         }
@@ -59,15 +60,8 @@ namespace ASUSInfoTool
             await Task.Run(() =>
             {
                 var data = new GetData();
-                string serial;
-                if (data.GetBios()[0].ToString() == "System Serial Number")
-                {
-                    serial = data.GetBaseboard()[1].ToString();
-                }
-                else
-                {
-                    serial = data.GetBios()[0].ToString();
-                }
+                string serial = data.GetBios()[0].ToString() == "System Serial Number" ? data.GetBaseboard()[1].ToString() : data.GetBios()[0].ToString();
+                string rls = data.Checkapp(rog) is "Not installed" or "0" ? data.CheckappWow(rogwow64) : data.Checkapp(rog);
                 serial = Regex.Replace(serial, @"\s", "");
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); ;
                 using StreamWriter file = new(desktop + "\\ASUS-LOG-" + serial + ".txt", append: false);
@@ -94,7 +88,7 @@ namespace ASUSInfoTool
                 file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0] + "\n");
                 file.WriteLineAsync("ASUS Services ═════════════════════════════════════════════════════════");
                 file.WriteLineAsync("ArmouryCrate Service : " + data.Checkapp(acs));
-                file.WriteLineAsync("ROG Live Service : " + data.Checkapp(rog));
+                file.WriteLineAsync("ROG Live Service : " + rls);
                 file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk) + "\n");
                 file.WriteLineAsync("ASUS Drivers ══════════════════════════════════════════════════════════");
                 file.WriteLineAsync("Keyboard Hotkeys (ATK) : " + data.GetDriver("ATK Package")[0].ToString());

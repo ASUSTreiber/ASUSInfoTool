@@ -77,6 +77,22 @@ namespace ASUSInfoTool
             }
         }
 
+        public string CheckappWow(string app)
+        {
+            string subkey = "SOFTWARE\\WOW6432Node\\ASUS\\";
+            string keyName = localMachine + "\\" + subkey + app;
+
+            var Version = Registry.GetValue(keyName, "Version", null);
+            if (Version != null)
+            {
+                return (string)Version;
+            }
+            else
+            {
+                return "Not installed";
+            }
+        }
+
         /// <summary>
         /// Check if ASUS OS
         /// </summary>
