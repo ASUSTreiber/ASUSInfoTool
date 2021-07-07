@@ -14,29 +14,26 @@ namespace ASUSInfoTool
 
         public ArrayList AppX(string args)
         {
-            using (PowerShell PowerShellInst = PowerShell.Create())
+            using PowerShell PowerShellInst = PowerShell.Create();
+            string criteria = args;
+            var appx = new ArrayList();
+            PowerShellInst.AddScript("Get-AppxPackage " + criteria);
+            Collection<PSObject> PSOutput = PowerShellInst.Invoke();
+            foreach (PSObject obj in PSOutput)
             {
-                string criteria = args;
-                var appx = new ArrayList();
-                PowerShellInst.AddScript("Get-AppxPackage " + criteria);
-                Collection<PSObject> PSOutput = PowerShellInst.Invoke();
-                foreach (PSObject obj in PSOutput)
+                if (obj != null)
                 {
-                    if (obj != null)
-                    {
-                        appx.Add(obj.Properties["Version"].Value.ToString());
-                    }
+                    appx.Add(obj.Properties["Version"].Value.ToString());
                 }
-                if (appx.Count > 0)
-                {
-                    return appx;
-                }
-                else
-                {
-                    appx.Add("Not Installed");
-                    return appx;
-                }
-
+            }
+            if (appx.Count > 0)
+            {
+                return appx;
+            }
+            else
+            {
+                appx.Add("Not Installed");
+                return appx;
             }
         }
 
