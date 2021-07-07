@@ -36,7 +36,7 @@ namespace ASUSInfoTool
                 serial_value.Content = data.GetBaseboard()[1];
             }
             else
-            { 
+            {
                 serial_value.Content = data.GetBios()[0];
             }
             bios_value.Content = data.GetBios()[1];
@@ -57,6 +57,8 @@ namespace ASUSInfoTool
 
             Createlog_Button.Content = "Bitte Warten...";
             Createlog_Button.IsEnabled = false;
+            Main.Effect = new System.Windows.Media.Effects.BlurEffect();
+            loading.Visibility = Visibility.Visible;
             await Task.Run(() =>
             {
                 var data = new GetData();
@@ -74,23 +76,24 @@ namespace ASUSInfoTool
                 {
                     string[] gpudata = gpu.ToString().Split(',');
                     file.WriteLineAsync("GPU    : " + gpudata[0]);
-                    file.WriteLineAsync("Driver : " + gpudata[1] + "\n");
+                    file.WriteLineAsync("Driver : " + gpudata[1]);
+                    file.WriteLineAsync("HW-ID  : " + gpudata[2]);
                 }
-                file.WriteLineAsync("ASUS LOG ══════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("\nASUS LOG ══════════════════════════════════════════════════════════════");
                 file.WriteLineAsync("ASDCD : " + data.CheckASDC());
-                file.WriteLineAsync("ASHDI : " + data.CheckASHDI() + "\n");
-                file.WriteLineAsync("ASUS APPs ═════════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ASHDI : " + data.CheckASHDI());
+                file.WriteLineAsync("\nASUS APPs ═════════════════════════════════════════════════════════════");
                 file.WriteLineAsync("MyASUS : " + data.AppX("*ASUSPCAssistant*")[0]);
                 file.WriteLineAsync("ScreenXpert  : " + data.AppX("*ScreenPadMaster*")[0]);
                 file.WriteLineAsync("ArmouryCrate : " + data.AppX("*armoury*")[0]);
                 file.WriteLineAsync("AURA Creator : " + data.AppX("*AURACreator*")[0]);
                 file.WriteLineAsync("KeyboardHotkeys : " + data.AppX("*ASUSKeyboardHotkeys*")[0]);
-                file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0] + "\n");
-                file.WriteLineAsync("ASUS Services ═════════════════════════════════════════════════════════");
+                file.WriteLineAsync("HealthCharging  : " + data.AppX("*ASUSBatteryHealthCharging*")[0]);
+                file.WriteLineAsync("\nASUS Services ═════════════════════════════════════════════════════════");
                 file.WriteLineAsync("ArmouryCrate Service : " + data.Checkapp(acs));
                 file.WriteLineAsync("ROG Live Service : " + rls);
-                file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk) + "\n");
-                file.WriteLineAsync("ASUS Drivers ══════════════════════════════════════════════════════════");
+                file.WriteLineAsync("ATK Package (OSD) : " + data.Checkapp(atk));
+                file.WriteLineAsync("\nASUS Drivers ══════════════════════════════════════════════════════════");
                 file.WriteLineAsync("Keyboard Hotkeys (ATK) : " + data.GetDriver("ATK Package")[0].ToString());
                 file.WriteLineAsync("System Control Interface : " + data.GetDriver("ASUS System Control Interface")[0].ToString());
                 file.WriteLineAsync("Precision Touchpad : " + data.GetDriver("ASUS Precision Touchpad")[0].ToString());
@@ -99,8 +102,10 @@ namespace ASUSInfoTool
                 file.WriteLineAsync("Wireless Radio Control : " + data.GetDriver("ASUS Wireless Radio Control")[0].ToString());
             });
             MessageBox.Show("Log wurde geschrieben und auf dem Desktop gespeichert.\nBitte senden Sie die Datei an den Support.");
+            Main.Effect = null;
+            loading.Visibility = Visibility.Hidden;
             Createlog_Button.Content = "LOG Datei erstellen";
             Createlog_Button.IsEnabled = true;
         }
-}
+    }
 }

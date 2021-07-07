@@ -154,7 +154,7 @@ namespace ASUSInfoTool
             var myAL = new ArrayList();
             foreach (var provider in providers)
             {
-                myAL.Add(provider["Name"] + "," + provider["DriverVersion"]);
+                myAL.Add(provider["Name"] + "," + provider["DriverVersion"] + "," + provider["PNPDeviceID"]);
             }
             return myAL;
         }
